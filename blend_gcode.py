@@ -14,6 +14,7 @@ parser = argparse.ArgumentParser(description='Combine 2 gcode files from Slic3r,
 parser.add_argument('files', metavar='F', type=str, nargs=2,
                     help='gcode input')
 parser.add_argument('--output', type=str, default="output-merged.gcode", help='merged output name')
+parser.add_argument('--regex', type=str, default="; move to next layer \(([0-9]*)\)", help="Regular expression to parse the layer from. It must include the layer number as the first submatch. Default matches Slic3r's verbose output.")
 
 args = parser.parse_args()
 file_1 = args.files[0]
@@ -25,7 +26,7 @@ layer_1 = -1
 layer_2 = -1
 layers_1[-1] = []
 layers_2[-1] = []
-nextlayer = re.compile("; move to next layer \(([0-9]*)\)")
+nextlayer = re.compile(args.regex)
 for line_from_file_1, line_from_file_2 in izip_longest(open(file_1), open(file_2)):
     if line_from_file_1 is not None:
         if re.search(nextlayer, line_from_file_1) is not None:
